@@ -29,13 +29,11 @@ ActiveRecord::Schema.define(version: 20180430220533) do
 
   create_table "song_performances", force: :cascade do |t|
     t.integer  "position_id"
-    t.integer  "concert_id"
     t.integer  "song_id"
-    t.integer  "set_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-    t.index ["concert_id"], name: "index_song_performances_on_concert_id"
-    t.index ["set_id"], name: "index_song_performances_on_set_id"
+    t.integer  "concert_set_id"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["concert_set_id"], name: "index_song_performances_on_concert_set_id"
     t.index ["song_id"], name: "index_song_performances_on_song_id"
   end
 
