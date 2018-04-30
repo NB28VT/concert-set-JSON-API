@@ -1,0 +1,2 @@
+class ConcertSet < ApplicationRecord
+end
