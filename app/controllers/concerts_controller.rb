@@ -1,7 +1,7 @@
 class ConcertsController < ApplicationController
   before_action :get_concert, only: [:show]
   def show
-    render_json(@concert)
+    json_response(@concert)
   end
 
   private

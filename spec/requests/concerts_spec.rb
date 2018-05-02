@@ -3,10 +3,6 @@ require "rails_helper"
 RSpec.describe "Concerts API", type: :request do
   describe "GET /concerts/:id" do
     context "when the record exists" do
-      # it "returns a status code 200" do
-      #   expect(response).to have_http_status(200)
-      # end
-
       it "includes the concert's venue name" do
         concert = create(:concert)
         venue = create(:venue, name: "Saratoga Performing Arts Center")
