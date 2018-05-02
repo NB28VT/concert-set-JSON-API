@@ -4,12 +4,12 @@ RSpec.describe "Concerts API", type: :request do
   describe "GET /concerts/:id" do
     context "when the record exists" do
       it "includes the concert's venue name" do
-        concert = create(:concert)
         venue = create(:venue, name: "Saratoga Performing Arts Center")
+        concert = create(:concert, venue: venue)
 
         get "/concerts/#{concert.id}"
 
-        expect(json.dig("venue", "name")).to eq("Saratoga Performing Arts Center")
+        expect(json.dig("concert", "venue", "name")).to eq("Saratoga Performing Arts Center")
       end
 
       it "returns a concert's sets in order" do
