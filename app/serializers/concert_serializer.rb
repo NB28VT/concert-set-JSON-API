@@ -3,5 +3,5 @@ class ConcertSerializer < ActiveModel::Serializer
 
   has_one :venue
   # belongs_to :venue
-  # has_many :concert_sets
+  has_many :concert_sets, key: :set
 end

@@ -9,35 +9,49 @@ RSpec.describe "Concerts API", type: :request do
 
         get "/concerts/#{concert.id}"
 
-        expect(json.dig("concert", "venue", "name")).to eq("Saratoga Performing Arts Center")
+        expect(json["concert"]["venue"]["name"]).to eq("Saratoga Performing Arts Center")
       end
 
       it "returns a concert's sets in order" do
         concert = create(:concert)
-        concert_sets = create_list(:concert_set, 3, concert: concert)
+        set_1 = create(:concert_set, concert: concert, position_id: 1)
+        set_2 = create(:concert_set, concert: concert, position_id: 2)
+        set_3 = create(:concert_set,  concert: concert, position_id: 3)
 
         get "/concerts/#{concert.id}"
-        expect(json).to have_concerts_in_order(concert_sets)
+
+        expect(json["sets"][0][:set_number]).to eq(1)
+        expect(json["sets"][1][:set_number]).to eq(2)
+        expect(json["sets"][2][:set_number]).to eq(3)
       end
 
       it "returns songs in each set in order" do
+        concert = create(:concert)
+        set_1 = create(:concert_set, concert: concert, position_id: 1)
+
+        song_2 = create(:song, name: "Bathub Gin")
+        song_performance_2 = create(:song_performance, concert_set: set_1, song: song_2, position_id: 2)
+
+        song_1 = create(:song, name: "Roggae")
+        song_performance_1 = create(:song_performance, concert_set: set_1, song: song_1, position_id: 1)
+
+        get "/concerts/#{concert.id}"
+
+        expect(json["sets"][0]["songs"][0]["name"]).to eq(song_1.name)
+        expect(json["sets"][0]["songs"][1]["name"]).to eq(song_2.name)
       end
     end
 
     context "when the record doesn't exist" do
       it "returns status code 404" do
+        get "/concerts/1000"
+
+        expect(json).to have_http_status(404)
       end
 
       it "returns a helpful message" do
+        expect(json).to match(/Couldn't find concert with id\d+/)
       end
     end
   end
-
-
-  # Save for future
-  # def have_concerts_in_order(concert_sets)
-  #   eq concert_sets
-  #   # Can use RSpec matchers here
-  # end
-
 end
