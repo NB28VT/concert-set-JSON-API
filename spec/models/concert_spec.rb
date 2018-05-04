@@ -5,4 +5,5 @@ RSpec.describe Concert, type: :model do
   it { should have_many(:concert_sets).dependent(:destroy) }
 
   it { should validate_presence_of(:show_date)}
+  it { should validate_presence_of(:venue)}
 end
