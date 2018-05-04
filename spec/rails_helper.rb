@@ -47,6 +47,7 @@ RSpec.configure do |config|
   config.before(:suite) do
    DatabaseCleaner.clean_with(:truncation)
    DatabaseCleaner.strategy = :transaction
+   FactoryBot.lint
   end
 
   config.around(:each) do |example|
