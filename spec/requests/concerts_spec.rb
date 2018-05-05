@@ -3,15 +3,17 @@ require "rails_helper"
 RSpec.describe "Concerts API", type: :request do
   describe "GET /api/v1/concerts" do
     it "returns a list of concerts" do
-      venue = create(:venue)
-      show_date = Faker::Date.rand
-      concert_1 = create(:concert, show_date: show_date, venue: venue)
       concerts = create_list(:concert, 10)
 
       get "/api/v1/concerts"
 
       expect(json["concerts"].count).to eq(10)
-      expect(json["concerts"][1]["show_date"]).to eq(show_date)
+      expect(json["concerts"].first).to eq(
+        {
+          id: concerts.first.id,
+          show_date: concerts.first.show_date
+        }
+      )
     end
 
     it "returns the total number of results" do
@@ -23,14 +25,17 @@ RSpec.describe "Concerts API", type: :request do
     end
 
     it "filters concerts by year" do
-      1996_show_venue = create(:venue)
-      create(:concert, show_date: DateTime.new(1996,8,13), venue: 1996_show_venue)
+      venue = create(:venue)
+      create(:concert, show_date: DateTime.new(1996,8,13), venue: venue)
       create(:concert, show_date: DateTime.new(1997,11,22))
 
-      get "/api/v1/concerts/1997"
+      get "/api/v1/concerts", {year: 1997}
 
-      expect(json["total_results"]).to eq(1)
-      expect(json["concerts"][0]["venue"]["name"]).to eq(1996_show_venue.name)
+      expect(json["concerts"].count).to eq(1)
+      expect(json["concerts"].map(&:show_date)).to all(eq(1997))
+    end
+
+    it "returns the total number of results" do
     end
 
     it "filters results by page limit" do
