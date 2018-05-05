@@ -1,7 +1,49 @@
 require "rails_helper"
 
 RSpec.describe "Concerts API", type: :request do
-  describe "GET /concerts/:id" do
+  describe "GET /api/v1/concerts" do
+    it "returns a list of concerts" do
+      venue = create(:venue)
+      show_date = Faker::Date.rand
+      concert_1 = create(:concert, show_date: show_date, venue: venue)
+      concerts = create_list(:concert, 10)
+
+      get "/api/v1/concerts"
+
+      expect(json["concerts"].count).to eq(10)
+      expect(json["concerts"][1]["show_date"]).to eq(show_date)
+    end
+
+    it "returns the total number of results" do
+      concerts = create_list(:concert, 10)
+
+      get "/api/v1/concerts"
+
+      expect(json["total_results"]).to eq(10)
+    end
+
+    it "filters concerts by year" do
+      1996_show_venue = create(:venue)
+      create(:concert, show_date: DateTime.new(1996,8,13), venue: 1996_show_venue)
+      create(:concert, show_date: DateTime.new(1997,11,22))
+
+      get "/api/v1/concerts/1997"
+
+      expect(json["total_results"]).to eq(1)
+      expect(json["concerts"][0]["venue"]["name"]).to eq(1996_show_venue.name)
+    end
+
+    it "filters results by page limit" do
+    end
+
+    it "filters results by page number" do
+    end
+
+    it "filters concerts by venue" do
+    end
+  end
+
+  describe "GET /api/v1/concerts/:id" do
     context "when the record exists" do
       it "includes the concert's venue name" do
         venue = create(:venue, name: "Saratoga Performing Arts Center")
@@ -50,7 +92,7 @@ RSpec.describe "Concerts API", type: :request do
       end
 
       it "returns a helpful message" do
-        expect(json).to match(/Couldn't find concert with id\d+/)
+        expect(json).to match(/Couldn't find concert with id\s+\d+/)
       end
     end
   end
