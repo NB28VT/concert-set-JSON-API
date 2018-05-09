@@ -11,22 +11,31 @@ RSpec.describe "Concerts API", type: :request do
       expect(json["concerts"].count).to eq(2)
       expect(json["concerts"].first).to eq(
         {
-          id: first_concert.id,
-          show_date: first_concert.show_date,
-          venue:
+          "id" => first_concert.id,
+          "show_date" => first_concert.show_date.strftime("%m/%d/%Y"),
+          "venue" =>
             {
-              id: first_concert.id,
-              venue: first_concert.venue
+              "id" => first_concert.id,
+              "name" => first_concert.venue.name
             }
         }
       )
     end
 
     it "returns the total number of results" do
-      concerts = create_list(:concert, 10)
+      concerts = create_list(:concert, 1)
 
       get "/api/v1/concerts"
 
+      expect(json["total_results"]).to eq(1)
+    end
+
+    it "returns 10 results by default" do
+      concerts = create_list(:concert, 11)
+
+      get "/api/v1/concerts"
+
+      expect(json["concerts"].count).to eq(10)
       expect(json["total_results"]).to eq(10)
     end
 
@@ -41,16 +50,49 @@ RSpec.describe "Concerts API", type: :request do
       expect(json["concerts"].map(&:show_date)).to all(eq(1997))
     end
 
-    it "returns the total number of results" do
-    end
-
     it "filters results by page limit" do
+      concerts = create_list(:concert, 2)
+
+      get "/api/v1/concerts", {limit: 1}
+
+      expect(json["total_results"]).to eq(1)
     end
 
     it "filters results by page number" do
+      concerts = create_list(:concert, 2)
+      second_concert = concerts.second
+
+      get "/api/v1/concerts", {limit: 1, page: 2}
+
+      expect(json["concerts"].first).to eq(
+        {
+          id: second_concert.id,
+          show_date: second_concert.show_date,
+          venue:
+            {
+              id: second_concert.id,
+              venue: second_concert.venue
+            }
+        }
+      )
     end
 
-    it "filters concerts by venue" do
+    it "filters concerts by venue ID" do
+      first_concert = create(:concert, venue: {name: "First"})
+      second_concert = create(:concert, venue: {name: "Second"})
+
+      get "/api/v1/concerts", {venue: first_concert.id}
+
+      expect(json["concerts"].count).to eq(1)
+      expect(json["concerts"].all?{|concert| concert["venue"]["id"] == first_concert.id}).to be(true)
+    end
+
+    it "filters concerts by venue name" do
+      first_concert = create(:concert, venue: {name: "First"})
+      second_concert = create(:concert, venue: {name: "Second"})
+
+      expect(json["concerts"].count).to eq(1)
+      expect(json["concerts"].all?{|concert| concert["venue"]["name"] == first_concert.name}).to be(true)
     end
   end
 

@@ -2,7 +2,7 @@ class Api::V1::ConcertsController < ApplicationController
   before_action :get_concert, only: [:show]
 
   def index
-    json_response(Concert.all)
+    render json: Concert.all, each_serializer: ConcertIndexSerializer
   end
 
 
