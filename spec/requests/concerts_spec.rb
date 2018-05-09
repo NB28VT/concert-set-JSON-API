@@ -36,7 +36,7 @@ RSpec.describe "Concerts API", type: :request do
       get "/api/v1/concerts"
 
       expect(json["concerts"].count).to eq(10)
-      expect(json["total_results"]).to eq(10)
+      expect(json["per_page"]).to eq(10)
     end
 
     it "filters concerts by year" do

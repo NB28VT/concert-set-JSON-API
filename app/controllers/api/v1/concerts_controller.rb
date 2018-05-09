@@ -2,7 +2,10 @@ class Api::V1::ConcertsController < ApplicationController
   before_action :get_concert, only: [:show]
 
   def index
-    render json: Concert.all, each_serializer: ConcertIndexSerializer
+    concerts = Concert.merge(search_params).all.paginate(page: params[:page], per_page: params[:per_page])
+
+
+    render json: concerts, each_serializer: ConcertIndexSerializer
   end
 
 

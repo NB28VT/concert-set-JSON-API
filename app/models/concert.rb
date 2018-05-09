@@ -4,4 +4,7 @@ class Concert < ApplicationRecord
 
   validates_presence_of :show_date
   validates_presence_of :venue
+
+  # For will paginate
+  self.per_page = 10
 end
