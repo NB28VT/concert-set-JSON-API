@@ -1,7 +1,7 @@
-# Rails.application.routes.default_url_options = {
-#   host: "localhost",
-#   port: 3000
-# }
+Rails.application.routes.default_url_options = {
+  host: "localhost",
+  port: 3000
+}
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -11,6 +11,12 @@ Rails.application.configure do
   # your test database is "scratch space" for the test suite and is wiped
   # and recreated between test runs. Don't rely on the data there!
   config.cache_classes = true
+
+  # TODO: investigate whether this is really necessary for request specs
+  config.action_controller.default_url_options = {
+    host: "localhost",
+    port: 3000
+  }
 
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that

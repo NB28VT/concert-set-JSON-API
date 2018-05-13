@@ -30,7 +30,7 @@ RSpec.describe "Concerts API", type: :request do
       get "/api/v1/concerts"
 
       # TODO: remove need to pass host and port with a pre-test config
-      expect(json["data"][0]["links"]["self"]).to eq(api_v1_concert_url(concert, {host: "localhost", port: 3000}))
+      expect(json["data"][0]["links"]["self"]).to eq(api_v1_concert_url(concert))
     end
 
     it "returns information and a link on the concert's venue" do
@@ -42,7 +42,7 @@ RSpec.describe "Concerts API", type: :request do
       venue_relationship = json["data"][0]["relationships"]["venue"]
       expect(venue_relationship["data"]["id"]).to eq(venue.id.to_s)
       expect(venue_relationship["data"]["type"]).to eq("venues")
-      expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue, {host: "localhost", port: 3000}))
+      expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue))
     end
 
     it "returns the total number of results" do
