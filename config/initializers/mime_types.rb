@@ -2,3 +2,6 @@
 
 # Add new mime types for use in respond_to blocks:
 # Mime::Type.register "text/richtext", :rtf
+
+# Needed for Firefox support? Comment out for now
+# Mime::Type.register "application/vnd.api+json", :json
