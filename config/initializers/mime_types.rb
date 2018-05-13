@@ -4,4 +4,4 @@
 # Mime::Type.register "text/richtext", :rtf
 
 # Needed for Firefox support? Comment out for now
-# Mime::Type.register "application/vnd.api+json", :json
+Mime::Type.register "application/vnd.api+json", :json
