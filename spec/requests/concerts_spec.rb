@@ -2,24 +2,48 @@ require "rails_helper"
 
 RSpec.describe "Concerts API", type: :request do
   describe "GET /api/v1/concerts" do
+    it "returns a JSON API content type" do
+      get "/api/v1/concerts"
+      expect(response.content_type).to eq('application/vnd.api+json')
+    end
+
     it "returns a list of concerts" do
       concerts = create_list(:concert, 2)
-      first_concert = concerts.first
 
       get "/api/v1/concerts"
 
-      expect(json["concerts"].count).to eq(2)
-      expect(json["concerts"].first).to eq(
-        {
-          "id" => first_concert.id,
-          "show_date" => first_concert.show_date.strftime("%m/%d/%Y"),
-          "venue" =>
-            {
-              "id" => first_concert.id,
-              "name" => first_concert.venue.name
-            }
-        }
-      )
+      expect(json["data"].count).to eq(2)
+      expect(json["data"][0]["type"]).to eq("concerts")
+    end
+
+    it "returns a concert's show date" do
+      concert = create(:concert)
+
+      get "/api/v1/concerts"
+
+      expect(json["data"][0]["attributes"]["show-date"]).to eq(concert.show_date)
+    end
+
+    it "returns a link to the concert's URL" do
+      concert = create(:concert)
+
+      get "/api/v1/concerts"
+
+      # TODO: remove need to pass host and port with a pre-test config
+      expect(json["data"][0]["links"]["self"]).to eq(api_v1_concert_url(concert, {host: "localhost", port: 3000}))
+    end
+
+    it "returns information and a link on the concert's venue" do
+      concert = create(:concert)
+
+      get "/api/v1/concerts"
+
+      venue = concert.venue
+      venue_data = json["data"][0]["relationships"]["venue"]["data"]
+      expect(venue_data["id"]).to eq(venue.id.to_s)
+      expect(venue_data["type"]).to eq("venues")
+      binding.pry
+      expect(venue_data["links"]["self"]).to eq(api_v1_venue_url(venue, {host: "localhost", port: 3000}))
     end
 
     it "returns the total number of results" do

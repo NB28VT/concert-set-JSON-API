@@ -6,4 +6,6 @@ class ConcertIndexSerializer < ActiveModel::Serializer
   end
 
   has_one :venue
+  link(:self) { api_v1_concert_url(object)}
+
 end
