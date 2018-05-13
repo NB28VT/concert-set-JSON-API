@@ -39,11 +39,10 @@ RSpec.describe "Concerts API", type: :request do
       get "/api/v1/concerts"
 
       venue = concert.venue
-      venue_data = json["data"][0]["relationships"]["venue"]["data"]
-      expect(venue_data["id"]).to eq(venue.id.to_s)
-      expect(venue_data["type"]).to eq("venues")
-      binding.pry
-      expect(venue_data["links"]["self"]).to eq(api_v1_venue_url(venue, {host: "localhost", port: 3000}))
+      venue_relationship = json["data"][0]["relationships"]["venue"]
+      expect(venue_relationship["data"]["id"]).to eq(venue.id.to_s)
+      expect(venue_relationship["data"]["type"]).to eq("venues")
+      expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue, {host: "localhost", port: 3000}))
     end
 
     it "returns the total number of results" do
