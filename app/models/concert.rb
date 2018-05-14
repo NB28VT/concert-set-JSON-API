@@ -6,5 +6,5 @@ class Concert < ApplicationRecord
   validates_presence_of :venue
 
   # For will paginate
-  self.per_page = 10
+  self.per_page = 25
 end

@@ -29,7 +29,6 @@ RSpec.describe "Concerts API", type: :request do
 
       get "/api/v1/concerts"
 
-      # TODO: remove need to pass host and port with a pre-test config
       expect(json["data"][0]["links"]["self"]).to eq(api_v1_concert_url(concert))
     end
 
@@ -45,21 +44,45 @@ RSpec.describe "Concerts API", type: :request do
       expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue))
     end
 
-    it "returns the total number of results" do
+    it "returns a link to the venue's concerts" do
+      concert = create(:concert)
+
+      get "/api/v1/concerts"
+
+      venue = concert.venue
+      venue_relationship = json["data"][0]["relationships"]["venue"]
+      expect(venue_relationship["links"]["concerts"]).to eq(api_v1_venue_concerts_url(venue)
+    end
+
+    it "returns the total number of results and pages" do
       concerts = create_list(:concert, 1)
 
       get "/api/v1/concerts"
 
-      expect(json["total_results"]).to eq(1)
+      expect(json["meta"]["total-results"]).to eq(1)
+      expect(json["meta"]["total-pages"]).to eq(1)
     end
 
-    it "returns 10 results by default" do
-      concerts = create_list(:concert, 11)
+    it "returns 25 results per page" do
+      concerts = create_list(:concert, 26)
 
       get "/api/v1/concerts"
 
-      expect(json["concerts"].count).to eq(10)
-      expect(json["per_page"]).to eq(10)
+      expect(json["data"].count).to eq(25)
+    end
+
+    it "paginates results" do
+      concerts = create_list(:concert, 26)
+
+      get "/api/v1/concerts", {page: 2}
+
+      expect(json["data"].count).to eq(1)
+
+      # TODO: more robust link tests (test link content)
+      links = json["links"]
+      expect(links["next"]).to eq(nil)
+      expect(links["prev"]).to eq(links["first"])
+      expect(links["self"]).to eq(links["last"])
     end
 
     it "filters concerts by year" do
@@ -69,53 +92,8 @@ RSpec.describe "Concerts API", type: :request do
 
       get "/api/v1/concerts", {year: 1997}
 
-      expect(json["concerts"].count).to eq(1)
-      expect(json["concerts"].map(&:show_date)).to all(eq(1997))
-    end
-
-    it "filters results by page limit" do
-      concerts = create_list(:concert, 2)
-
-      get "/api/v1/concerts", {limit: 1}
-
-      expect(json["total_results"]).to eq(1)
-    end
-
-    it "filters results by page number" do
-      concerts = create_list(:concert, 2)
-      second_concert = concerts.second
-
-      get "/api/v1/concerts", {limit: 1, page: 2}
-
-      expect(json["concerts"].first).to eq(
-        {
-          id: second_concert.id,
-          show_date: second_concert.show_date,
-          venue:
-            {
-              id: second_concert.id,
-              venue: second_concert.venue
-            }
-        }
-      )
-    end
-
-    it "filters concerts by venue ID" do
-      first_concert = create(:concert, venue: {name: "First"})
-      second_concert = create(:concert, venue: {name: "Second"})
-
-      get "/api/v1/concerts", {venue: first_concert.id}
-
-      expect(json["concerts"].count).to eq(1)
-      expect(json["concerts"].all?{|concert| concert["venue"]["id"] == first_concert.id}).to be(true)
-    end
-
-    it "filters concerts by venue name" do
-      first_concert = create(:concert, venue: {name: "First"})
-      second_concert = create(:concert, venue: {name: "Second"})
-
-      expect(json["concerts"].count).to eq(1)
-      expect(json["concerts"].all?{|concert| concert["venue"]["name"] == first_concert.name}).to be(true)
+      expect(json["data"].count).to eq(1)
+      expect(json["data"].first["attributes"]["show_date"]).to match(/1997\/\d{2}\/\d{2}/)
     end
   end
 

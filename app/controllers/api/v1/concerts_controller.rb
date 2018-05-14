@@ -2,7 +2,7 @@ class Api::V1::ConcertsController < ApplicationController
   before_action :get_concert, only: [:show]
 
   def index
-    concerts = Concert.all
+    concerts = Concert.paginate(page: params[:page])
 
     render json: concerts, each_serializer: ConcertIndexSerializer
   end
