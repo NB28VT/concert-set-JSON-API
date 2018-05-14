@@ -51,7 +51,7 @@ RSpec.describe "Concerts API", type: :request do
 
       venue = concert.venue
       venue_relationship = json["data"][0]["relationships"]["venue"]
-      expect(venue_relationship["links"]["concerts"]).to eq(api_v1_venue_concerts_url(venue)
+      expect(venue_relationship["links"]["concerts"]).to eq(api_v1_venue_concerts_url(venue))
     end
 
     it "returns the total number of results and pages" do
@@ -90,10 +90,10 @@ RSpec.describe "Concerts API", type: :request do
       create(:concert, show_date: DateTime.new(1996,8,13), venue: venue)
       create(:concert, show_date: DateTime.new(1997,11,22))
 
-      get "/api/v1/concerts", {year: 1997}
+      get "/api/v1/concerts", params: {filter: {year: 1997} }
 
       expect(json["data"].count).to eq(1)
-      expect(json["data"].first["attributes"]["show_date"]).to match(/1997\/\d{2}\/\d{2}/)
+      expect(json["data"].first["attributes"]["show-date"]).to match(/^\d{2}\/\d{2}\/1997$/)
     end
   end
 
