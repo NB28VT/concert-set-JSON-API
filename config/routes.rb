@@ -4,7 +4,11 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :concerts, only: [:index, :show]
       resources :songs, only: [:index, :show]
-      resources :venues, only: [:index, :show]
+      resources :venues, only: [:index, :show] do
+        member do
+          get :concerts
+        end
+      end
     end
   end
 

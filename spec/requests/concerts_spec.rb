@@ -16,12 +16,12 @@ RSpec.describe "Concerts API", type: :request do
       expect(json["data"][0]["type"]).to eq("concerts")
     end
 
-    it "returns a concert's show date" do
+    it "returns a concert's show date in an easily readable format" do
       concert = create(:concert)
 
       get "/api/v1/concerts"
 
-      expect(json["data"][0]["attributes"]["show-date"]).to eq(concert.show_date)
+      expect(json["data"][0]["attributes"]["show-date"]).to eq(concert.show_date.strftime("%m/%d/%Y"))
     end
 
     it "returns a link to the concert's URL" do
@@ -44,23 +44,13 @@ RSpec.describe "Concerts API", type: :request do
       expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue))
     end
 
-    it "returns a link to the venue's concerts" do
-      concert = create(:concert)
-
-      get "/api/v1/concerts"
-
-      venue = concert.venue
-      venue_relationship = json["data"][0]["relationships"]["venue"]
-      expect(venue_relationship["links"]["concerts"]).to eq(api_v1_venue_concerts_url(venue))
-    end
-
     it "returns the total number of results and pages" do
-      concerts = create_list(:concert, 1)
+      concerts = create_list(:concert, 26)
 
       get "/api/v1/concerts"
 
-      expect(json["meta"]["total-results"]).to eq(1)
-      expect(json["meta"]["total-pages"]).to eq(1)
+      expect(json["meta"]["total-results"]).to eq(26)
+      expect(json["meta"]["total-pages"]).to eq(2)
     end
 
     it "returns 25 results per page" do
@@ -74,7 +64,7 @@ RSpec.describe "Concerts API", type: :request do
     it "paginates results" do
       concerts = create_list(:concert, 26)
 
-      get "/api/v1/concerts", {page: 2}
+      get "/api/v1/concerts", params: {page: 2}
 
       expect(json["data"].count).to eq(1)
 
@@ -86,8 +76,7 @@ RSpec.describe "Concerts API", type: :request do
     end
 
     it "filters concerts by year" do
-      venue = create(:venue)
-      create(:concert, show_date: DateTime.new(1996,8,13), venue: venue)
+      create(:concert, show_date: DateTime.new(1996,8,13))
       create(:concert, show_date: DateTime.new(1997,11,22))
 
       get "/api/v1/concerts", params: {filter: {year: 1997} }

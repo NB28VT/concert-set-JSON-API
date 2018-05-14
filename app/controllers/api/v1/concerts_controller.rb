@@ -11,7 +11,7 @@ class Api::V1::ConcertsController < ApplicationController
       concerts = Concert.paginate(page: params[:page])
     end
 
-    render json: concerts, each_serializer: ConcertIndexSerializer
+    render json: concerts, each_serializer: ConcertIndexSerializer, meta: pagination_meta(concerts)
   end
 
   def show
@@ -19,6 +19,13 @@ class Api::V1::ConcertsController < ApplicationController
   end
 
   private
+
+  def pagination_meta(concerts)
+    {
+      total_results: concerts.total_entries,
+      total_pages: concerts.total_pages
+    }
+  end
 
   def get_concert
     @concert = Concert.find(params[:id])
