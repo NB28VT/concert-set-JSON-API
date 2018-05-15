@@ -88,14 +88,32 @@ RSpec.describe "Concerts API", type: :request do
 
   describe "GET /api/v1/concerts/:id" do
     context "when the record exists" do
-      it "includes the concert's venue name" do
-        venue = create(:venue, name: "Saratoga Performing Arts Center")
+      it "includes information on the concert's venue" do
+        venue = create(:venue)
         concert = create(:concert, venue: venue)
 
         get "/concerts/#{concert.id}"
 
-        expect(json["concert"]["venue"]["name"]).to eq("Saratoga Performing Arts Center")
+        venue_relationship = json["data"]["relationships"]["venue"]
+        expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue))
+        expect(venue_relationship["data"]).to eq({"type": "venue", "id": venue.id.to_s})
+
+        included_venue = json["included"].find{|i| i["type"] = "venue" }
+        expect(included_venue["attributes"]["id"]).to eq(venue.id.to_s)
+        expect(included_venue["attributes"]["name"]).to eq(venue.name)
       end
+
+      it "includes a concert's sets in order" do
+        concert = create(:concert)
+        set_1 = create(:concert_set, concert: concert, position_id: 1)
+        set_2 = create(:concert_set, concert: concert, position_id: 2)
+        set_3 = create(:concert_set,  concert: concert, position_id: 3)
+
+        get "/concerts/#{concert.id}"
+
+        # JSON API
+      end
+
 
       it "returns a concert's sets in order" do
         concert = create(:concert)
@@ -105,9 +123,10 @@ RSpec.describe "Concerts API", type: :request do
 
         get "/concerts/#{concert.id}"
 
-        expect(json["sets"][0][:set_number]).to eq(1)
-        expect(json["sets"][1][:set_number]).to eq(2)
-        expect(json["sets"][2][:set_number]).to eq(3)
+        setlist_relationship = json["data"]["included"]["concert_sets"]
+        expect(setlist_relationship[0]["attributes"]["set_number"]).to eq(set_1.position_id)
+        expect(setlist_relationship[1]["attributes"]["set_number"]).to eq(set_2.position_id)
+        expect(setlist_relationship[2]["attributes"]["set_number"]).to eq(set_3.position_id)
       end
 
       it "returns songs in each set in order" do
@@ -122,8 +141,6 @@ RSpec.describe "Concerts API", type: :request do
 
         get "/concerts/#{concert.id}"
 
-        expect(json["sets"][0]["songs"][0]["name"]).to eq(song_1.name)
-        expect(json["sets"][0]["songs"][1]["name"]).to eq(song_2.name)
       end
     end
 
