@@ -15,7 +15,7 @@ class Api::V1::ConcertsController < ApplicationController
   end
 
   def show
-    json_response(@concert)
+    render json: @concert, include: ['song_performances', 'song_performances.song']
   end
 
   private

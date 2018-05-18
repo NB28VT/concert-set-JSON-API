@@ -113,17 +113,17 @@ RSpec.describe "Concerts API", type: :request do
 
         get "/api/v1/concerts/#{concert.id}"
 
-        binding.pry
-        song_relationship = json["data"]["relationships"]["song-performances"].first
-        expect(song_relationship["data"]["type"]).to eq("song-performances")
-        expect(song_relationship["data"]["id"]).to eq(song.id)
+        song_relationships = json["data"]["relationships"]["song-performances"]
+        expect(song_relationships["data"][0]["type"]).to eq("song-performances")
+        expect(song_relationships["data"][0]["id"]).to eq(song.id.to_s)
 
-        included_song = json["included"].find{|resource| resource["type"] == "song-performance"}
-        expect(included_song["attributes"]["id"]).to eq(song.id)
-        expect(included_song["attributes"]["name"]).to eq(song.name)
-        expect(included_song["attributes"]["set_position"]).to eq(song.set_position)
-        expect(included_song["attributes"]["set_number"]).to eq(song.concert_set.set_number)
-        expect(included_song["links"]["self"]).to eq(api_v1_song_url(song))
+        # TODO: need set information
+        included_song = json["included"].find{|resource| resource["type"] == "song-performances"}
+        expect(included_song["id"]).to eq(song.id.to_s)
+        expect(included_song["attributes"]["set-position"]).to eq(song_performance.set_position)
+        binding.pry
+        expect(included_song["relationships"]["song"]["name"]).to eq(song.name)
+        expect(included_song["relationships"]["songs"]["links"]["self"]).to eq(api_v1_song_url(song))
       end
     end
 
