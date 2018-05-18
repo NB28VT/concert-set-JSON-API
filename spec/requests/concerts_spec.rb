@@ -103,44 +103,24 @@ RSpec.describe "Concerts API", type: :request do
         expect(included_venue["attributes"]["name"]).to eq(venue.name)
       end
 
-      it "includes a concert's sets in order" do
+      it "includes a concert's songs" do
         concert = create(:concert)
-        set_1 = create(:concert_set, concert: concert, position_id: 1)
-        set_2 = create(:concert_set, concert: concert, position_id: 2)
-        set_3 = create(:concert_set,  concert: concert, position_id: 3)
+        set_1 = create(:concert_set, concert: concert, set_number: 1)
+
+        song = create(:song)
+        song_performance = create(:song_performance, concert_set: set_1, song: song, set_position: 1)
 
         get "/concerts/#{concert.id}"
 
-        # JSON API
-      end
+        song_relationship = json["relationships"]["songs"]["data"]
+        expect(song_relationship["type"]).to eq ("song")
+        expect(song_relationship["id"]).to eq (song.id)
 
-
-      it "returns a concert's sets in order" do
-        concert = create(:concert)
-        set_1 = create(:concert_set, concert: concert, position_id: 1)
-        set_2 = create(:concert_set, concert: concert, position_id: 2)
-        set_3 = create(:concert_set,  concert: concert, position_id: 3)
-
-        get "/concerts/#{concert.id}"
-
-        setlist_relationship = json["data"]["included"]["concert_sets"]
-        expect(setlist_relationship[0]["attributes"]["set_number"]).to eq(set_1.position_id)
-        expect(setlist_relationship[1]["attributes"]["set_number"]).to eq(set_2.position_id)
-        expect(setlist_relationship[2]["attributes"]["set_number"]).to eq(set_3.position_id)
-      end
-
-      it "returns songs in each set in order" do
-        concert = create(:concert)
-        set_1 = create(:concert_set, concert: concert, position_id: 1)
-
-        song_2 = create(:song, name: "Bathub Gin")
-        song_performance_2 = create(:song_performance, concert_set: set_1, song: song_2, position_id: 2)
-
-        song_1 = create(:song, name: "Roggae")
-        song_performance_1 = create(:song_performance, concert_set: set_1, song: song_1, position_id: 1)
-
-        get "/concerts/#{concert.id}"
-
+        included_song = json["included"].find{|resource| resource["type"] == "song"}
+        expect(included_song["attributes"]["id"]).to eq(song.id)
+        expect(included_song["attributes"]["name"]).to eq(song.name)
+        expect(included_song["attributes"]["set_position"]).to eq(song.set_position)
+        expect(included_song["attributes"]["set_number"]).to eq(song.concert_set.set_number)
       end
     end
 
