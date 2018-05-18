@@ -111,17 +111,19 @@ RSpec.describe "Concerts API", type: :request do
         song = create(:song)
         song_performance = create(:song_performance, concert_set: set_1, song: song, set_position: 1)
 
-        get "/concerts/#{concert.id}"
+        get "/api/v1/concerts/#{concert.id}"
 
-        song_relationship = json["relationships"]["songs"]["data"]
-        expect(song_relationship["type"]).to eq ("song")
-        expect(song_relationship["id"]).to eq (song.id)
+        binding.pry
+        song_relationship = json["data"]["relationships"]["song-performances"].first
+        expect(song_relationship["data"]["type"]).to eq("song-performances")
+        expect(song_relationship["data"]["id"]).to eq(song.id)
 
-        included_song = json["included"].find{|resource| resource["type"] == "song"}
+        included_song = json["included"].find{|resource| resource["type"] == "song-performance"}
         expect(included_song["attributes"]["id"]).to eq(song.id)
         expect(included_song["attributes"]["name"]).to eq(song.name)
         expect(included_song["attributes"]["set_position"]).to eq(song.set_position)
         expect(included_song["attributes"]["set_number"]).to eq(song.concert_set.set_number)
+        expect(included_song["links"]["self"]).to eq(api_v1_song_url(song))
       end
     end
 

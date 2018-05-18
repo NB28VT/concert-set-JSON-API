@@ -5,5 +5,5 @@ class ConcertSerializer < ActiveModel::Serializer
     venue = object.venue
     link(:self) {api_v1_venue_url(venue)}
   end
-  has_many :concert_sets, key: :set
+  has_many :song_performances, include: :id
 end

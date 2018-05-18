@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :concert_set do
-    sequence(:position_id)
+    sequence(:set_number)
     concert
   end
 end

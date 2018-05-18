@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180430220533) do
+ActiveRecord::Schema.define(version: 20180518174158) do
 
   create_table "concert_sets", force: :cascade do |t|
     t.integer  "concert_id"
-    t.integer  "position_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.integer  "set_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "concerts", force: :cascade do |t|
@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20180430220533) do
   end
 
   create_table "song_performances", force: :cascade do |t|
-    t.integer  "position_id"
+    t.integer  "set_position"
     t.integer  "song_id"
     t.integer  "concert_set_id"
     t.datetime "created_at",     null: false

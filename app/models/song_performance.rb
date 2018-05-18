@@ -4,5 +4,5 @@ class SongPerformance < ApplicationRecord
 
   validates_presence_of :song_id
   validates_presence_of :concert_set_id
-  validates_presence_of :position_id
+  validates_presence_of :set_position
 end
