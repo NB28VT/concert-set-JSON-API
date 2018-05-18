@@ -92,11 +92,12 @@ RSpec.describe "Concerts API", type: :request do
         venue = create(:venue)
         concert = create(:concert, venue: venue)
 
-        get "/concerts/#{concert.id}"
+        get "/api/v1/concerts/#{concert.id}"
 
         venue_relationship = json["data"]["relationships"]["venue"]
         expect(venue_relationship["links"]["self"]).to eq(api_v1_venue_url(venue))
-        expect(venue_relationship["data"]).to eq({"type": "venue", "id": venue.id.to_s})
+        expect(venue_relationship["data"]["type"]).to eq("venues")
+        expect(venue_relationship["data"]["id"]).to eq(venue.id.to_s)
 
         included_venue = json["included"].find{|i| i["type"] = "venue" }
         expect(included_venue["attributes"]["id"]).to eq(venue.id.to_s)
