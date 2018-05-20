@@ -119,7 +119,7 @@ RSpec.describe "Concerts API", type: :request do
         expect(performance_relationships["data"][0]["id"]).to eq(song_performance.id.to_s)
       end
 
-      it "includes a concert's songs as included records" do
+      it "includes a concert's song perfomances as included records" do
         concert = create(:concert)
         set_1 = create(:concert_set, concert: concert, set_number: 1)
 
@@ -139,13 +139,15 @@ RSpec.describe "Concerts API", type: :request do
 
     context "when the record doesn't exist" do
       it "returns status code 404" do
-        get "/concerts/1000"
+        get "/api/v1/concerts/1000"
 
-        expect(json).to have_http_status(404)
+        expect(response).to have_http_status(404)
       end
 
       it "returns a helpful message" do
-        expect(json).to match(/Couldn't find concert with id\s+\d+/)
+        get "/api/v1/concerts/1000"
+
+        expect(json["message"]).to match(/Couldn't find Concert with \'id\'=\d+/)
       end
     end
   end

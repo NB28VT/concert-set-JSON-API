@@ -6,5 +6,5 @@ RSpec.describe SongPerformance, type: :model do
 
   it { should validate_presence_of(:song_id) }
   it { should validate_presence_of(:concert_set_id) }
-  it { should validate_presence_of(:position_id) }
+  it { should validate_presence_of(:set_position) }
 end
