@@ -21,6 +21,15 @@ RSpec.describe "Venues API" do
       expect(json["data"].count).to eq(25)
     end
 
+    it "returns the total number of results and pages" do
+      create_list(:venue, 26)
+
+      get "/api/v1/venues"
+
+      expect(json["meta"]["total-results"]).to eq(26)
+      expect(json["meta"]["total-pages"]).to eq(2)
+    end
+
     it "paginates results" do
       create_list(:venue, 26)
 
@@ -39,28 +48,28 @@ RSpec.describe "Venues API" do
 
       get "/api/v1/venues"
 
-      expect(json[0]["links"]["self"]).to eq(api_v1_venue_url(url))
+      expect(json["data"][0]["links"]["self"]).to eq(api_v1_venue_url(venue))
     end
 
     it "includes the venue's name" do
       venue = create(:venue)
       get "/api/v1/venues"
 
-      expect(json[0]["attributes"]["name"]).to eq(venue.name)
+      expect(json["data"][0]["attributes"]["name"]).to eq(venue.name)
     end
 
     it "includes the venue's state" do
       venue = create(:venue)
       get "/api/v1/venues"
 
-      expect(json[0]["attributes"]["state"]).to eq(venue.state)
+      expect(json["data"][0]["attributes"]["state"]).to eq(venue.state)
     end
 
     it "includes a link to the venue's concerts" do
       venue = create(:venue)
       get "/api/v1/venues"
 
-      expect(json[0]["attributes"]["links"]).to eq(api_v1_venue_concerts_url)
+      expect(json["data"][0]["relationships"]["concerts"]["links"]["related"]).to eq(concerts_api_v1_venue_url(venue))
     end
   end
 
