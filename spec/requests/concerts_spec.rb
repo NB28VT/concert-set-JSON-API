@@ -147,7 +147,7 @@ RSpec.describe "Concerts API", type: :request do
       it "returns a helpful message" do
         get "/api/v1/concerts/1000"
 
-        expect(json["message"]).to match(/Couldn't find Concert with \'id\'=\d+/)
+        expect(json["errors"]["title"]).to match(/Couldn't find Concert with \'id\'=\d+/)
       end
     end
   end

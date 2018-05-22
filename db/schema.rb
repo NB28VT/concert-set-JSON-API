@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180518174158) do
+ActiveRecord::Schema.define(version: 20180521132751) do
 
   create_table "concert_sets", force: :cascade do |t|
     t.integer  "concert_id"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 20180518174158) do
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "state"
   end
 
 end
